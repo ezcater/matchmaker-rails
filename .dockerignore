@@ -1,0 +1,12 @@
+.env.example
+.env.local
+.git
+.github
+Jenkinsfile
+README.md
+coverage
+docker-compose.yml
+log
+production-readiness.md
+service.yml
+tmp

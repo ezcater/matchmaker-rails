@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+bundle check || bundle install
+
+bindir="$(dirname "$0")"
+
+# if [ -z "$IGNORE_SCHEMA_REGISTRY" ]; then
+#   "$bindir"/wait_for_health_check schema-registry-web:21004/health_check
+# else
+#   echo "Skipping schema-registry check"
+# fi
+# if [ -z "$IGNORE_KAFKA" ]; then
+#   "$bindir"/wait_for_kafka
+# else
+#   echo "Skipping Kafka check"
+# fi
+
+# Start spring server so that docker/run can exec other commands
+# against the web container
+spring server &
+
+bundle exec rails s -p 23008 -b 0.0.0.0

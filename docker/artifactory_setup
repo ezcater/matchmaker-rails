@@ -1,0 +1,7 @@
+export BUNDLE_EZCATER__JFROG__IO=${BUNDLE_EZCATER__JFROG__IO:-$(grep -e "^BUNDLE_EZCATER__JFROG__IO:" ~/.bundle/config | cut -d\" -f 2)}
+if [ -z "$BUNDLE_EZCATER__JFROG__IO" ]; then
+  echo "" >&2
+  echo "Command Failed: Ensure that bundler is installed locally and that credentials are configured for ezcater.jfrog.io." >&2
+  echo "See https://ezcater.atlassian.net/wiki/spaces/POL/pages/247627778/Artifactory#Artifactory-RubyGems" >&2
+  exit 1
+fi

@@ -1,0 +1,21 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see Rails configuration guide
+  # http://guides.rubyonrails.org/configuring.html#database-pooling
+  host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
+  username: <%= ENV.fetch("POSTGRES_USER", ENV["USER"]) %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD", "") %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+
+development:
+  <<: *default
+  database: matchmaker_rails_development
+
+test:
+  <<: *default
+  database: matchmaker_rails_test
+
+production:
+  <<: *default
+  url: <%= ENV["DATABASE_URL"] %>

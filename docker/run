@@ -1,0 +1,11 @@
+#!/bin/bash
+. "$(dirname "$0")"/check_network
+if docker-compose exec -T matchmaker-web echo "Running in existing matchmaker-web container ..." 2>/dev/null
+then
+  run_or_exec="exec"
+else
+  run_or_exec="run --rm"
+fi
+
+. "$(dirname "$0")"/artifactory_setup
+docker-compose $run_or_exec -e COLUMNS="`tput cols`" -e LINES="`tput lines`" matchmaker-web bash -c "$*"

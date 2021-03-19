@@ -1,0 +1,16 @@
+---
+manifest_version: '1'
+generated_at: '2021-03-19 14:23:51'
+name: matchmaker
+port: '23008'
+components:
+- name: web
+- name: db
+  environment:
+  - POSTGRES_HOST
+  - POSTGRES_USER
+  configuration:
+    postgres_image: postgres:12.2-alpine
+    postgres_version: '12.2'
+configuration: {}
+environment: []

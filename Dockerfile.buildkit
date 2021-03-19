@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:experimental
+FROM ezcater-production.jfrog.io/ruby:ec8b951224
+
+ARG SKIP_REQUIRED_ENV_VAR_ENFORCEMENT=true
+
+RUN apt-get update && apt-get install -y \
+  rsync \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY Gemfile* /usr/src/app/
+ARG BUNDLE_EZCATER__JFROG__IO
+
+RUN --mount=id=cache,type=cache,from=ezcater-production.jfrog.io/matchmaker:latest,source=/usr/local/bundle,target=/tmp/bundle rsync -a /tmp/bundle/ /usr/local/bundle/
+RUN bundle install --without test development staging && bundle clean --force
+
+ADD . /usr/src/app
+
+RUN mkdir -p /usr/src/app/tmp/cache/assets/
+RUN --mount=type=cache,from=ezcater-production.jfrog.io/matchmaker:latest,source=/usr/src/app/tmp/cache/assets,target=/tmp/cache/assets rsync -a /tmp/cache/assets/ /usr/src/app/tmp/cache/assets/
+RUN RAILS_ENV=production SECRET_KEY_BASE=fakekeybase bundle exec rails assets:precompile
+
+EXPOSE 23008
+CMD ["rails", "server", "-p", "23008", "-b", "0.0.0.0"]

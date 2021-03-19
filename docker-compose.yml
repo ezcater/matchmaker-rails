@@ -1,0 +1,48 @@
+version: "3.4"
+volumes:
+  bundle-volume: 
+  shared-volume: 
+networks:
+  default:
+    external:
+      name: ezcater-development-network
+x-environment: &default-environment
+  BUNDLE_EZCATER__JFROG__IO: 
+  BOOTSNAP_CACHE_DIR: /usr/src/shared/bootsnap
+  PRYRC: /usr/src/app/.docker-pryrc
+  BUNDLE_IGNORE_CONFIG: 1
+  BUNDLE_DISABLE_SHARED_GEMS: "true"
+  POSTGRES_HOST: matchmaker-db
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: password
+x-service: &default-service
+  build:
+    context: .
+    args:
+    - BUNDLE_EZCATER__JFROG__IO
+  volumes:
+  - /Users/jeffdwyer/Documents/workspace/ezcater/matchmaker-rails:/usr/src/app
+  - bundle-volume:/usr/local/bundle:delegated
+  - shared-volume:/usr/src/shared:delegated
+  tty: true
+  stdin_open: true
+  depends_on:
+  - matchmaker-db
+services:
+  matchmaker-db:
+    container_name: matchmaker-rails_matchmaker-db_1
+    image: postgres:12.2-alpine
+    volumes:
+    - /Users/jeffdwyer/postgresql/12.2/data/matchmaker:/var/lib/postgresql/data:delegated
+    environment:
+      POSTGRES_PASSWORD: password
+  matchmaker-web:
+    <<: *default-service
+    container_name: matchmaker-rails_matchmaker-web_1
+    environment:
+      <<: *default-environment
+      IGNORE_KAFKA: 
+      IGNORE_SCHEMA_REGISTRY: 
+    command: bin/start
+    ports:
+    - 127.0.0.1:23008:23008

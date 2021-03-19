@@ -1,0 +1,88 @@
+# For a full reference, see:
+# https://skyline-docs.ezcater.net/configuration/service_yml
+
+name: matchmaker
+skip_production_deploy: true
+class: prototype
+pipeline:
+  sandbox_cd_branch: master
+experimental:
+  docker:
+    buildkit: true
+staging:
+  environment:
+    RACK_ENV: staging
+    RAILS_ENV: staging
+production:
+  environment:
+    RACK_ENV: production
+    RAILS_ENV: production
+deployables:
+  dbmigrate:
+    type: job
+    command: bundle exec rake db:migrate
+  post-migration-checks:
+    type: job
+    command: bundle exec rake ezcater_migrations:run_checks
+  web:
+    type: web
+    port: 3000
+    command: bundle exec rails server -p 3000 -b 0.0.0.0
+    health_check_path: /api/health_check
+    staging:
+      host: matchmaker.staging-ezcater.com
+      replicas: 2
+    production:
+      host: matchmaker.ezcater.com
+      replicas: 3
+predeploy:
+- dbmigrate
+postdeploy:
+- post-migration-checks
+tests:
+  primary:
+  - name: matchmaker
+    command: tail -f /dev/null
+    environment:
+      RACK_ENV: test
+      RAILS_ENV: test
+      POSTGRES_USER: ezcater
+      POSTGRES_PASSWORD: password
+    junit: rspec.xml
+    artifacts:
+    - coverage/
+  services:
+  - name: postgres
+    image: postgres:12.2-alpine
+    environment:
+      POSTGRES_USER: ezcater
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: matchmaker_rails_test
+  steps:
+  - run:
+      test: download cc-test-reporter
+      command: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64
+        -o cc-test-reporter
+  - run:
+      test: cc-test-reporter permissions
+      command: chmod +x ./cc-test-reporter
+  - run:
+      test: bundle
+      command: bundle install --with test
+  - run:
+      test: cc-before-build
+      command: ./cc-test-reporter before-build
+  - run:
+      test: rspec
+      command: bundle exec rspec --format RspecJunitFormatter --out rspec.xml
+  - run:
+      test: rubocop
+      command: bundle exec rubocop
+  - run:
+      test: cc-after-build
+      command: ./cc-test-reporter after-build -t simplecov --exit-code $? || echo
+        "Skipping Code Climate coverage upload"
+regions:
+- us-east-1
+owner: liberrty
+assets: /usr/src/app/public/matchmaker
