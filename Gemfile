@@ -10,6 +10,7 @@ gem 'ezcater_feature_flag-client', '>= 0.6.0'
 gem 'required_env_fetcher'
 gem 'private_attr', require: 'private_attr/everywhere'
 gem 'lograge'
+gem "haml-rails", "~> 2.0"
 gem 'ice_nine', require: ["ice_nine", "ice_nine/core_ext/object"]
 gem 'ezcater_trusted_proxies-rails'
 gem 'ezcater_metrics'
@@ -44,6 +45,7 @@ group :development, :test do
 end
 
 group :development do
+  gem 'annotate'
   gem 'ezcater_docker_shared'
   gem 'overcommit', require: false
   gem 'foreman', require: false
