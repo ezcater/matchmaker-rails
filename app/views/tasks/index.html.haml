@@ -1,1 +1,28 @@
 %h1 foo
+
+%h2 Agents
+%ul
+  %li.grid-x
+    .cell.large-2
+      %h3 Name
+    .cell.large-2
+      %h3 Stats
+    .cell.large-2
+      %h3 Tasks
+
+
+- @agents.each do |a|
+  %li.grid-x
+    .cell.large-2
+      Name
+      = a.name
+    .cell.large-2.grid-x
+      .cell Available Brainshare
+      .cell= a.available_brainshare.round(2)
+    .cell.large-2
+      %ul.tasks
+        - #debugger
+        - a.tasks.each do |t|
+          = t.object_id
+          = t.type
+
