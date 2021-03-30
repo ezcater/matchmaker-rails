@@ -8,15 +8,36 @@
 #
 class Task < ApplicationRecord
   attr_accessor :brainshare_required,
-              :type,
-              :taken
+                :type,
+                :state,
+                :agent,
+                :work_left
 
   def initialize(attributes = nil)
     super
-    @taken = false
+    @state = :new
+    @work_left = @brainshare_required
   end
 
-  def mark_taken!
-    @taken = true
+  def mark_taken! agent
+    @state = :taken
+    @agent = agent
+  end
+
+  def taken?
+    @state == :taken
+  end
+
+  def complete?
+    @state == :complete
+  end
+
+  def work_it
+    @work_left -= 0.01
+    if @work_left <= 0
+      @state = :complete
+      @work_left = 0
+      @agent.complete!(self)
+    end
   end
 end

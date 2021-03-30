@@ -11,7 +11,7 @@ class MatchMaker
 
     @tasks = []
 
-    500.times do
+    10.times do
 
       case rand()
       when 0..0.5
@@ -27,27 +27,34 @@ class MatchMaker
     end
 
     @agents = []
-    20.times do
+    2.times do
       @agents << Agent.new(available_brainshare: 1, name: Faker::Name.name)
     end
   end
 
   def run
     # while @running
-    assign
+    Thread.new do
+      assign
+    end
     # end
   end
 
   def assign
     @agents.each do |agent|
       @tasks.each do |task|
-        next if task.taken
-        if (agent.available_brainshare > task.brainshare_required)
-          agent.match(task)
-          break
+        if task.taken?
+          task.work_it
+        elsif task.complete?
+          next
+        else
+          if (agent.available_brainshare > task.brainshare_required)
+            agent.match(task)
+            break
+          end
         end
+        sleep(0.1)
       end
     end
   end
-
 end

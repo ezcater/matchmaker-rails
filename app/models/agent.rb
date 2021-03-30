@@ -10,8 +10,7 @@
 #  updated_at           :datetime         not null
 #
 class Agent < ApplicationRecord
-  attr_accessor :available_brainshare,
-                :skills,
+  attr_accessor :skills,
                 :in_memory,
                 :tasks,
                 :name
@@ -22,8 +21,15 @@ class Agent < ApplicationRecord
   end
 
   def match task
-    @available_brainshare -= task.brainshare_required
-    task.mark_taken!
+    task.mark_taken!(self)
     @tasks << task
+  end
+
+  def complete! task
+    @tasks.delete task
+  end
+
+  def available_brainshare
+    @tasks.inject(1){|memo, t| memo - t.brainshare_required}
   end
 end
