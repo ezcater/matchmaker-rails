@@ -1,7 +1,5 @@
 class TasksController < ApplicationController
   def index
-    MatchMaker.instance.run
-
     # @articles = Article.all
     #
     #
@@ -11,5 +9,20 @@ class TasksController < ApplicationController
 
   def show
     # @article = Article.find(params[:id])
+  end
+
+  def create
+    MatchMaker.instance.create_tasks
+    redirect_to tasks_path
+  end
+
+  def start
+    MatchMaker.instance.start
+    redirect_to tasks_path
+  end
+
+  def stop
+    MatchMaker.instance.stop
+    redirect_to tasks_path
   end
 end

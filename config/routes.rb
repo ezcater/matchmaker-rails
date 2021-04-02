@@ -5,6 +5,11 @@ MatchmakerRails::Application.routes.draw do
 
   root "tasks#index"
 
-  get "/tasks", to: "tasks#index"
-  get "/tasks/:id", to: "tasks#show"
+  resources :tasks do
+    collection do
+      post :start
+      post :stop
+    end
+  end
+  resources :agents
 end

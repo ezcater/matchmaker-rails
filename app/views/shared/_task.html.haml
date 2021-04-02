@@ -1,0 +1,13 @@
+.card
+  .card-section
+    %h4= "#{task.type}-#{task.object_id}"
+    %p
+      = "Original #{task.brainshare_required}"
+      = "Work Left #{task.work_left.round(2)}"
+    %p
+      Contexts
+      = task.contexts
+    %p
+      Skills Required
+      = task.skills_required
+

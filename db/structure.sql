@@ -68,6 +68,36 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: scores; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.scores (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: scores_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.scores_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: scores_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.scores_id_seq OWNED BY public.scores.id;
+
+
+--
 -- Name: tasks; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -105,6 +135,13 @@ ALTER TABLE ONLY public.agents ALTER COLUMN id SET DEFAULT nextval('public.agent
 
 
 --
+-- Name: scores id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.scores ALTER COLUMN id SET DEFAULT nextval('public.scores_id_seq'::regclass);
+
+
+--
 -- Name: tasks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -136,6 +173,14 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: scores scores_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.scores
+    ADD CONSTRAINT scores_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: tasks tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -151,6 +196,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20210319171900'),
-('20210319172006');
+('20210319172006'),
+('20210331050418');
 
 

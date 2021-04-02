@@ -18,10 +18,26 @@ class Agent < ApplicationRecord
   def initialize(attributes = nil)
     super
     @tasks = []
+    @skills = []
+    @in_memory = []
+    @available_brainshare = 1
+    @name = Faker::Name.name
+
+    case rand()
+    when 0..0.2
+      @skills = %w(tasks phones)
+    when 0.2..0.4
+      @skills = %w(tasks)
+    when 0.4..0.6
+      @skills = %w(relish_sms phones)
+    else
+      @skills = %w(relish_sms)
+    end
   end
 
   def match task
-    task.mark_taken!(self)
+    task.mark_taken(self)
+    @in_memory |= task.contexts
     @tasks << task
   end
 
@@ -30,6 +46,26 @@ class Agent < ApplicationRecord
   end
 
   def available_brainshare
-    @tasks.inject(1){|memo, t| memo - t.brainshare_required}
+    @tasks.inject(1) { |memo, t| memo - t.brainshare_required }
   end
+
+  def process_matches
+    best = evaluate_matches(MatchMaker.instance.available_tasks).
+      sort_by { |a| a[0].overall_score }.
+      last
+
+    return if best.nil?
+    puts "Agent #{@name} #{@skills} Best match #{best[0].overall_score} Task #{best[1].type}"
+    if best[0].overall_score > 0.5
+      match(best[1])
+    end
+  end
+
+  def evaluate_matches tasks
+    res = tasks.map do |task|
+      [Score.new(agent: self, task: task), task]
+    end
+    res
+  end
+
 end

@@ -7,54 +7,86 @@ class MatchMaker
 
   def initialize
     super
-    @running = true
+    @running = false
 
     @tasks = []
+    @agents = []
 
-    10.times do
 
-      case rand()
-      when 0..0.5
-        @tasks << Task.new(brainshare_required: 0.9,
-                           type: :fulfillment_issue)
-      when 0.5..0.7
-        @tasks << Task.new(brainshare_required: 0.3,
-                           type: :caterer_accept)
-      else
-        @tasks << Task.new(brainshare_required: 0.5,
-                           type: :handle_reject)
+    Thread.new do
+      while true do
+        run
       end
     end
+  end
 
-    @agents = []
-    2.times do
-      @agents << Agent.new(available_brainshare: 1, name: Faker::Name.name)
+
+  def create_agent
+    @agents << Agent.new
+  end
+
+  def create_tasks
+    10.times do
+      case rand()
+      when 0..0.2
+        @tasks << Task.new_phone_task
+      when 0.2..0.4
+        @tasks << Task.new_relish_task
+      when 0.4..0.5
+        @tasks << Task.new_fi_task
+      when 0.5..0.7
+        @tasks << Task.new_ca_task
+      else
+        @tasks << Task.new_handle_reject_task
+      end
     end
   end
 
   def run
-    # while @running
-    Thread.new do
+    if @running
+      remove_completed
+      work
       assign
+      puts "run"
+    else
+      puts "skip"
     end
-    # end
+    sleep(1)
+  end
+
+  def remove_completed
+    @tasks.each do |task|
+      if task.complete?
+        puts "complete #{task}"
+        @tasks.delete task
+      end
+    end
+  end
+
+  def work
+    @tasks.each do |task|
+      if task.taken?
+        puts "work #{task}"
+        task.work_it
+      end
+    end
   end
 
   def assign
     @agents.each do |agent|
-      @tasks.each do |task|
-        if task.taken?
-          task.work_it
-        elsif task.complete?
-          next
-        else
-          if (agent.available_brainshare > task.brainshare_required)
-            agent.match(task)
-            break
-          end
-        end
-        sleep(0.1)
-      end
+      agent.process_matches
     end
+  end
+
+  def available_tasks
+    @tasks.select { |t| t.new? }
+  end
+
+  def start
+    @running = true
+  end
+
+  def stop
+    @running = false
   end
 end

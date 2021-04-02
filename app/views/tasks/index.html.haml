@@ -2,6 +2,13 @@
 .grid-x
   .cell.large-8
     %h2 MatchMaker
+    - if MatchMaker.instance.running
+      Status: Running
+      = link_to "Stop", stop_tasks_path, {method: :post, class: "button"}
+    - else
+      Status: Stopped
+      = link_to "Start", start_tasks_path, {method: :post, class: "button"}
+
     %ul
       %li.grid-x
         .cell.large-2
@@ -16,19 +23,27 @@
       %li.card
         .grid-x
           .cell.large-2
-            = a.name
+            %p
+              = link_to a.name, agent_path(a.object_id)
+            %p
+              Skills
+              = a.skills
           .cell.large-2.grid-x
-            .cell Available Brainshare
-            .cell= a.available_brainshare.round(2)
+            .cell= "Available Brainshare #{a.available_brainshare.round(2)}"
+            .cell In Memory
+            .cell= a.in_memory
           .cell.large-5
             %ul.tasks
               - a.tasks.each do |t|
-                = render "task", task: t
+                = render "shared/task", task: t
 
   .cell.large-4
     %h2 Tasks
+    = link_to "Add Agent", agents_path, class: "button", method: :post
+    = link_to "More tasks", tasks_path, class: "button", method: :post
+
     %ul
       - @tasks.each do |t|
         - if !t.taken? && !t.complete?
           %li.grid-x
-            = render "task", task: t
+            = render "shared/task", task: t
