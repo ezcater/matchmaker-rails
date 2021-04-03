@@ -30,8 +30,9 @@
               = a.skills
           .cell.large-2.grid-x
             .cell= "Available Brainshare #{a.available_brainshare.round(2)}"
-            .cell In Memory
-            .cell= a.in_memory
+            .cell
+              In Memory
+              = a.in_memory
           .cell.large-5
             %ul.tasks
               - a.tasks.each do |t|

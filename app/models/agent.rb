@@ -14,6 +14,7 @@ class Agent < ApplicationRecord
                 :in_memory,
                 :tasks,
                 :name
+  MAX_MEMORY = 8
 
   def initialize(attributes = nil)
     super
@@ -38,6 +39,11 @@ class Agent < ApplicationRecord
   def match task
     task.mark_taken(self)
     @in_memory |= task.contexts
+    if @in_memory.size > MAX_MEMORY
+      (@in_memory.size - MAX_MEMORY).times do
+        @in_memory.shift
+      end
+    end
     @tasks << task
   end
 
@@ -50,9 +56,7 @@ class Agent < ApplicationRecord
   end
 
   def process_matches
-    best = evaluate_matches(MatchMaker.instance.available_tasks).
-      sort_by { |a| a[0].overall_score }.
-      last
+    best = evaluate_matches(MatchMaker.instance.available_tasks).first
 
     return if best.nil?
     puts "Agent #{@name} #{@skills} Best match #{best[0].overall_score} Task #{best[1].type}"
@@ -64,7 +68,7 @@ class Agent < ApplicationRecord
   def evaluate_matches tasks
     res = tasks.map do |task|
       [Score.new(agent: self, task: task), task]
-    end
+    end.sort_by { |a| -a[0].overall_score }
     res
   end
 

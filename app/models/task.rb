@@ -13,19 +13,24 @@ class Task < ApplicationRecord
                 :state,
                 :agent,
                 :contexts,
-                :work_left
+                :work_left,
+                :eny1b,
+                :task_opportunity
 
   def self.new_fi_task
     Task.new(brainshare_required: 0.9,
              skills_required: ["tasks"],
              contexts: ["customer:#{rand(10)}"],
-             type: :fulfillment_issue)
+             task_opportunity: 0.7,
+             type: :fulfillment_issue
+    )
   end
 
   def self.new_ca_task
     Task.new(brainshare_required: 0.3,
              skills_required: ["tasks"],
              contexts: ["caterer:#{rand(10)}"],
+             task_opportunity: 0.2,
              type: :caterer_accept)
   end
 
@@ -49,6 +54,7 @@ class Task < ApplicationRecord
              skills_required: ["phones"],
              contexts: ["customer:#{rand(10)}",
                         "order:#{rand(10)}"],
+             task_opportunity: 1,
              type: :phone_task)
   end
 
@@ -56,6 +62,8 @@ class Task < ApplicationRecord
     super
     @state = :new
     @work_left = @brainshare_required
+    @eny1b = rand(3000) + 200
+    @task_opportunity ||= 0.5
   end
 
   def mark_taken agent

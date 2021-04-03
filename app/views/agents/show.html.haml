@@ -1,26 +1,32 @@
 .grid-x
   .cell.large-6
     %h2= @agent.name
-    .grid-x
-      .cell.large-12
-        %p= "Available Brainshare #{@agent.available_brainshare.round(2)}"
-        %p
-          In Memory
-          = @agent.in_memory
-        %p
-          Skills
-          = @agent.skills
   .cell.large-2
     = link_to "matchmaker", tasks_path
 .grid-x
-  .cell.large-5
+  .cell.large-3
+    %p= "Available Brainshare #{@agent.available_brainshare.round(2)}"
+    %p
+      In Memory
+      = @agent.in_memory
+    %p
+      Agent's Skills
+      = @agent.skills
+
+  .cell.large-9.agent-tasks
+    %h3 Task Sorted By Score
     %ul.tasks
-      - @matches.sort.each do |match|
-        .grid-x
-          .cell.large-2
+      - @matches.each do |match|
+        %li.grid-x.grid-padding-x
+          .cell.large-4
+            = render "shared/task", task: match[1]
+          .cell.large-8
             %p= "Score #{match[0].overall_score.round(3)}"
             %p= "Skill #{match[0].skill_match.round(3)}"
             %p= "Avail #{match[0].agent_availability.round(3)}"
-            %p= "Context #{match[0].context_match.round(3)}"
-          .cell.large-10
-            = render "shared/task", task: match[1]
+            %p
+              = "ContextMatch #{match[0].context_match.round(3)}"
+              - if match[0].context_match > 0
+                = match[0].matching_contexts
+            %p= "CustomerOpportunity #{match[0].customer_opportunity.round(3)}"
+            %p= "TaskOpportunity #{match[0].task_opportunity.round(3)}"

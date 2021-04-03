@@ -7,6 +7,7 @@ class AgentsController < ApplicationController
     puts "Agents found #{MatchMaker.instance.agents.map{|a|a.object_id}}"
 
     @matches = @agent.evaluate_matches(MatchMaker.instance.available_tasks)
+
     # @article = Article.find(params[:id])
   end
 
