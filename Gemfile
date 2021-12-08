@@ -53,7 +53,6 @@ group :development do
   gem 'foreman', require: false
   gem 'spring-commands-rubocop'
   gem 'spring-commands-rspec'
-  gem 'ezk', require: false
   gem 'aws-sdk-s3', require: false
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console', '>= 3.3.0'
